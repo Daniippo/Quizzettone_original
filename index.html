@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html lang="it">
 <head>
   <meta charset="UTF-8">
@@ -232,11 +231,17 @@
         const csv = await resp.text();
         const rows = parseCSV(csv);
         TOTAL_LEVELS = parseInt(rows[1][1]) || 0;
+        
+        // --- MODIFICA RICHIESTA: MAPPATURA COLONNE ---
         adventData = rows.slice(4, 4 + TOTAL_LEVELS).map((v, i) => ({
-          day: i + 1, question: v[1], answer: v[2],
+          day: i + 1, 
+          question: v[1],      // Colonna B (Domanda)
+          checkAnswer: v[2],   // Colonna C (Risposta breve per controllo logico)
+          answerOK: v[10],     // Colonna K (Testo formattato report)
           options: [v[3], v[4], v[5], v[6], v[7]].filter(o => o && o !== ""),
-          spiegazione: v[12]
+          spiegazione: v[12]   // Colonna M (Teoria/Spiegazione)
         }));
+        
         render();
       } catch (e) { alert("Errore caricamento sfida."); tornaAlMenu(); }
     }
@@ -291,7 +296,6 @@
       if (window.MathJax) MathJax.typeset();
     }
 
-    /* --- ANIMAZIONI --- */
     function animateCorrectStar(btn) {
       const star = document.createElement('div');
       star.className = 'flying-star';
@@ -334,7 +338,8 @@
       let att = (parseInt(localStorage.getItem(`tent_${sId}_${day}`)) || 0) + 1;
       localStorage.setItem(`tent_${sId}_${day}`, att);
 
-      if (val.trim().toLowerCase() === d.answer.toLowerCase()) {
+      // --- MODIFICA RICHIESTA: CONTROLLO SU checkAnswer ---
+      if (val.trim().toLowerCase() === d.checkAnswer.toLowerCase()) {
         document.getElementById('snd-ok').play().catch(()=>{});
         localStorage.setItem(`day_${sId}_${day}`, 'correct');
         animateCorrectStar(btn);
@@ -357,11 +362,12 @@
       body.innerHTML = '';
       adventData.forEach(d => {
         const theoryPart = d.spiegazione ? `<span class="theory-text">${d.spiegazione}</span>` : '';
+        // --- MODIFICA RICHIESTA: VISUALIZZAZIONE answerOK ---
         body.innerHTML += `
           <tr>
             <td>${d.day}</td>
             <td>${d.question}</td>
-            <td>"RispostaOK": "${d.answer}"${theoryPart}</td>
+            <td>${d.answerOK}${theoryPart}</td>
             <td>${localStorage.getItem(`tent_${currentSfida.id}_${d.day}`) || 1}</td>
           </tr>`;
       });

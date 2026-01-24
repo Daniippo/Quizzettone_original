@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Didattica Hub - Sfida Achille e la Tartaruga</title>
+
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#bfa100">
+  <link rel="apple-touch-icon" href="icon-512.png">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  
+  <script>
+    window.MathJax = { tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$']] } };
+  </script>
+  <script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+  <style>
+    :root {
+      --c-oro: #bfa100;
+      --c-accento: #27ae60;
+      --c-sfondo: #fdfbf7;
+      --c-testo: #2c3e50;
+      --c-errore: #e74c3c;
+    }
+
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    body { 
+      margin: 0; font-family: 'Inter', sans-serif; 
+      background: var(--c-sfondo); color: var(--c-testo); 
+      display: flex; flex-direction: column; min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* BARRA PUNTEGGIO */
+    #stars-bar {
+      position: fixed; top: 20px; right: 20px;
+      background: white; padding: 8px 15px; border-radius: 20px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      z-index: 2000; display: flex; align-items: center; gap: 8px;
+      font-weight: bold; color: var(--c-oro); border: 2px solid var(--c-oro);
+    }
+
+    /* ANIMAZIONI */
+    .flying-star {
+      position: fixed; z-index: 9999; font-size: 24px;
+      transition: all 0.8s cubic-bezier(0.6, -0.28, 0.735, 0.045);
+      pointer-events: none;
+    }
+
+    .exploding-poop {
+      position: fixed; z-index: 9999; font-size: 30px;
+      animation: poop-fade 0.6s forwards;
+      pointer-events: none;
+    }
+
+    @keyframes poop-fade {
+      0% { transform: scale(0.5); opacity: 0; }
+      20% { transform: scale(1.2); opacity: 1; }
+      100% { transform: translateY(20px) scale(1); opacity: 0; }
+    }
+
+    /* LAYOUT */
+    #menu-screen { padding: 40px 20px; display: flex; flex-direction: column; align-items: center; text-align: center; }
+    .logo-area h1 { font-family: 'Cinzel', serif; color: var(--c-oro); font-size: 2rem; margin-bottom: 10px; }
+    #sfide-list { width: 100%; max-width: 400px; margin-top: 20px; }
+    
+    .sfida-card { 
+      background: white; padding: 20px; margin-bottom: 15px; 
+      border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); 
+      cursor: pointer; border: 2px solid transparent; border-left-width: 8px;
+      transition: transform 0.2s; text-align: left;
+    }
+
+    #game-screen { display: none; flex-grow: 1; }
+    .header { padding: 15px; text-align: center; border-bottom: 3px solid var(--c-oro); background: white; position: sticky; top: 0; z-index: 100; display: flex; justify-content: space-between; align-items: center; }
+    .back-btn { background: none; border: none; font-size: 1.5rem; color: var(--c-oro); cursor: pointer; }
+
+    #main-game-area { padding: 40px 0; }
+    .vertical-track { position: relative; max-width: 500px; margin: 0 auto; display: flex; flex-direction: column; align-items: center; }
+    .node-container { width: 100%; position: relative; z-index: 2; display: flex; margin: 18px 0; justify-content: center; }
+
+    /* Zig-Zag */
+    .node-container:nth-child(8n+1) { transform: translateX(-110px); }
+    .node-container:nth-child(8n+2) { transform: translateX(-60px); }
+    .node-container:nth-child(8n+3) { transform: translateX(60px); }
+    .node-container:nth-child(8n+4) { transform: translateX(110px); }
+    .node-container:nth-child(8n+5) { transform: translateX(110px); }
+    .node-container:nth-child(8n+6) { transform: translateX(60px); }
+    .node-container:nth-child(8n+7) { transform: translateX(-60px); }
+    .node-container:nth-child(8n+8) { transform: translateX(-110px); }
+
+    .node { width: 55px; height: 55px; border-radius: 50%; background: white; border: 4px solid var(--c-oro); display: flex; justify-content: center; align-items: center; cursor: pointer; font-weight: bold; box-shadow: 0 4px 0 #ddd; transition: 0.2s; }
+    .node.done { background: var(--c-accento); color: white; border-color: #1e8449; box-shadow: 0 4px 0 #1e8449; }
+    .node.future { opacity: 0.3; filter: grayscale(1); cursor: not-allowed; }
+
+    .avatar { position: absolute; font-size: 38px; z-index: 10; transition: all 0.8s cubic-bezier(0.34, 1.56, 0.64, 1); margin-top: -50px; pointer-events: none; }
+
+    #modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); display: none; justify-content: center; align-items: center; z-index: 3000; }
+    #modal-content { background: white; padding: 25px; border-radius: 20px; width: 92%; max-width: 500px; text-align: center; max-height: 85vh; overflow-y: auto; }
+    
+    .btn-ans { background: var(--c-oro); color: white; border: none; padding: 14px; border-radius: 12px; cursor: pointer; font-weight: bold; margin: 10px auto; width: 100%; display: block; font-size: 1rem; }
+
+    #report-area { display: none; padding: 20px; background: white; text-align: center; }
+    .report-table-container { overflow-x: auto; margin-top: 20px; }
+    table { width: 100%; border-collapse: collapse; min-width: 600px; }
+    th, td { border: 1px solid #ddd; padding: 12px; text-align: left; vertical-align: top; }
+    th { background: var(--c-oro); color: white; }
+    .theory-text { font-size: 0.85rem; color: #555; font-style: italic; display: block; margin-top: 5px; border-top: 1px solid #eee; padding-top: 5px; }
+
+    @media print {
+      .no-print, #stars-bar, .header, .btn-ans, #menu-screen, #game-screen { display: none !important; }
+      #report-area { display: block !important; }
+      th { background-color: #eee !important; color: black !important; }
+    }
+  </style>
+</head>
+<body>
+
+  <div id="stars-bar">
+    <span>⭐</span>
+    <span id="stars-count">0</span>
+  </div>
+
+  <div id="menu-screen">
+    <div class="logo-area">
+      <h1>Didattica Hub</h1>
+      <p>Percorsi didattici Achille e la Tartaruga</p>
+    </div>
+    <div id="sfide-list">Caricamento sfide...</div>
+    <button class="btn-ans no-print" style="background:#7f8c8d; max-width:200px; margin-top:30px;" onclick="resetTutto()">RESET GLOBALE</button>
+  </div>
+
+  <div id="game-screen">
+    <div class="header no-print">
+      <button class="back-btn" onclick="tornaAlMenu()">❮</button>
+      <div>
+        <h1 id="topic-title" style="font-family:'Cinzel'; font-size:1rem; margin:0; color:var(--c-oro)">...</h1>
+        <small id="progress-text">0/0 completati</small>
+      </div>
+      <button class="back-btn" onclick="resetGame()">🔄</button>
+    </div>
+    <div id="main-game-area">
+      <div class="vertical-track">
+        <div id="achilles" class="avatar">🏃‍♂️</div>
+        <div id="tortoise" class="avatar">🐢</div>
+        <div id="nodes-container" style="width:100%"></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="report-area">
+    <h1 style="font-family:'Cinzel'; color: var(--c-oro);">Report Finale</h1>
+    <h2 id="final-stars">Stelle Totali: 0</h2>
+    <div class="report-table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Domanda</th>
+            <th>Risposta Corretta</th>
+            <th>Tentativi</th>
+          </tr>
+        </thead>
+        <tbody id="report-body"></tbody>
+      </table>
+    </div>
+    <div class="no-print">
+      <button class="btn-ans" style="display:inline-block; width:auto; padding: 12px 30px; margin-top: 20px;" onclick="window.print()">🖨️ STAMPA REPORT</button>
+      <button class="btn-ans" style="display:inline-block; width:auto; background:#7f8c8d; padding: 12px 30px;" onclick="tornaAlMenu()">🏠 HOME</button>
+    </div>
+  </div>
+
+  <div id="modal-overlay">
+    <div id="modal-content">
+      <div id="quiz-container"></div>
+      <div id="feedback-msg"></div>
+    </div>
+  </div>
+
+  <audio id="snd-ok" src="https://assets.mixkit.co/active_storage/sfx/2013/2013-preview.mp3"></audio>
+  <audio id="snd-no" src="https://www.myinstants.com/media/sounds/raspberry.mp3"></audio>
+
+  <script>
+    const URL_INDICE_SFIDE = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRo9ZeS6loicyVFU04pA29n5GxEeg3q7teyh2-Tsd4DUPzwjNyQsPE4OBwG7WF14rSdxbPeTn594i1D/pub?gid=892603852&single=true&output=csv";
+    
+    let SFIDE_CARICATE = [];
+    let currentSfida = null;
+    let adventData = [];
+    let TOTAL_LEVELS = 0;
+    let stars = 0;
+
+    async function init() {
+      try {
+        const resp = await fetch(URL_INDICE_SFIDE);
+        const csv = await resp.text();
+        const rows = parseCSV(csv);
+        SFIDE_CARICATE = rows.slice(1).map(r => ({ id: r[0], titolo: r[1], desc: r[2], url: r[3], colore: r[4] || "#bfa100" }));
+        renderMenu();
+      } catch (e) { document.getElementById('sfide-list').innerText = "Errore indice."; }
+    }
+
+    function renderMenu() {
+      document.getElementById('report-area').style.display = 'none';
+      document.getElementById('game-screen').style.display = 'none';
+      document.getElementById('menu-screen').style.display = 'flex';
+      const list = document.getElementById('sfide-list');
+      list.innerHTML = '';
+      SFIDE_CARICATE.forEach(s => {
+        const card = document.createElement('div');
+        card.className = 'sfida-card';
+        card.style.borderLeftColor = s.colore;
+        card.onclick = () => caricaSfida(s);
+        card.innerHTML = `<h2 style="color:${s.colore}">${s.titolo}</h2><p>${s.desc}</p>`;
+        list.appendChild(card);
+      });
+      document.getElementById('stars-bar').style.display = 'none';
+    }
+
+    async function caricaSfida(sfida) {
+      currentSfida = sfida;
+      document.documentElement.style.setProperty('--c-oro', sfida.colore);
+      stars = parseInt(localStorage.getItem(`stars_${sfida.id}`)) || 0;
+      document.getElementById('stars-count').innerText = stars;
+      document.getElementById('stars-bar').style.display = 'flex';
+      document.getElementById('menu-screen').style.display = 'none';
+      document.getElementById('game-screen').style.display = 'block';
+      document.getElementById('topic-title').innerText = sfida.titolo;
+      try {
+        const resp = await fetch(sfida.url);
+        const csv = await resp.text();
+        const rows = parseCSV(csv);
+        TOTAL_LEVELS = parseInt(rows[1][1]) || 0;
+        adventData = rows.slice(4, 4 + TOTAL_LEVELS).map((v, i) => ({
+          day: i + 1, question: v[1], answer: v[2],
+          options: [v[3], v[4], v[5], v[6], v[7]].filter(o => o && o !== ""),
+          spiegazione: v[12]
+        }));
+        render();
+      } catch (e) { alert("Errore caricamento sfida."); tornaAlMenu(); }
+    }
+
+    function render() {
+      const container = document.getElementById('nodes-container');
+      container.innerHTML = '';
+      let solved = 0;
+      adventData.forEach((d, i) => {
+        const day = i + 1;
+        const isDone = localStorage.getItem(`day_${currentSfida.id}_${day}`) === 'correct';
+        if (isDone) solved++;
+        const isFuture = (day > 1 && localStorage.getItem(`day_${currentSfida.id}_${day-1}`) !== 'correct');
+        const wrapper = document.createElement('div');
+        wrapper.className = 'node-container';
+        wrapper.innerHTML = `<div id="node-${day}" class="node ${isDone ? 'done' : (isFuture ? 'future' : '')}" onclick="${isFuture ? '' : `openQuiz(${day})`}">${isDone ? '✔' : day}</div>`;
+        container.appendChild(wrapper);
+      });
+      document.getElementById('progress-text').innerText = `${solved}/${TOTAL_LEVELS}`;
+      muoviPersonaggi(solved);
+      if (window.MathJax) MathJax.typeset();
+      if (solved === TOTAL_LEVELS && TOTAL_LEVELS > 0) setTimeout(showReport, 1500);
+    }
+
+    function muoviPersonaggi(solved) {
+      setTimeout(() => {
+        const achNode = document.getElementById(`node-${Math.min(solved + 1, TOTAL_LEVELS)}`);
+        const tortNode = document.getElementById(`node-${Math.min(solved + 2, TOTAL_LEVELS)}`);
+        if (achNode) {
+          document.getElementById('achilles').style.top = achNode.offsetTop + "px";
+          document.getElementById('achilles').style.left = (achNode.offsetLeft + 10) + "px";
+        }
+        if (tortNode) {
+          document.getElementById('tortoise').style.top = tortNode.offsetTop + "px";
+          document.getElementById('tortoise').style.left = (tortNode.offsetLeft + 10) + "px";
+        }
+      }, 100);
+    }
+
+    function openQuiz(day) {
+      const d = adventData[day-1];
+      const cont = document.getElementById('quiz-container');
+      document.getElementById('feedback-msg').innerText = ""; 
+      let h = `<h3>Domanda ${day}</h3><p style="font-weight:700;">${d.question}</p>`;
+      if (d.options.length > 0) {
+        d.options.forEach((o, i) => { h += `<button class="btn-ans" style="background:#fff; color:#333; border:2px solid #eee;" onclick="check(${day}, '${String.fromCharCode(64+i+1)}', this)">${String.fromCharCode(64+i+1)}. ${o}</button>`; });
+      } else {
+        h += `<input type="text" id="ans" style="width:100%; padding:15px; margin-bottom:15px; border-radius:10px;"><button class="btn-ans" onclick="check(${day}, document.getElementById('ans').value, this)">INVIA</button>`;
+      }
+      cont.innerHTML = h;
+      document.getElementById('modal-overlay').style.display = 'flex';
+      if (window.MathJax) MathJax.typeset();
+    }
+
+    /* --- ANIMAZIONI --- */
+    function animateCorrectStar(btn) {
+      const star = document.createElement('div');
+      star.className = 'flying-star';
+      star.innerText = '⭐';
+      const rect = btn.getBoundingClientRect();
+      star.style.left = rect.left + rect.width/2 + 'px';
+      star.style.top = rect.top + 'px';
+      document.body.appendChild(star);
+      const target = document.getElementById('stars-bar').getBoundingClientRect();
+      setTimeout(() => {
+        star.style.left = target.left + 'px';
+        star.style.top = target.top + 'px';
+        star.style.transform = 'scale(0.5)';
+        star.style.opacity = '0';
+      }, 50);
+      setTimeout(() => { star.remove(); stars++; aggiornaStelleVisive(); }, 850);
+    }
+
+    function animatePoop(btn) {
+      const poop = document.createElement('div');
+      poop.className = 'exploding-poop';
+      poop.innerText = '💩';
+      const rect = btn.getBoundingClientRect();
+      poop.style.left = rect.left + rect.width/2 - 15 + 'px';
+      poop.style.top = rect.top - 20 + 'px';
+      document.body.appendChild(poop);
+      stars = Math.max(0, stars - 1);
+      aggiornaStelleVisive();
+      setTimeout(() => poop.remove(), 650);
+    }
+
+    function aggiornaStelleVisive() {
+      document.getElementById('stars-count').innerText = stars;
+      localStorage.setItem(`stars_${currentSfida.id}`, stars);
+    }
+
+    function check(day, val, btn) {
+      const d = adventData[day-1];
+      const sId = currentSfida.id;
+      let att = (parseInt(localStorage.getItem(`tent_${sId}_${day}`)) || 0) + 1;
+      localStorage.setItem(`tent_${sId}_${day}`, att);
+
+      if (val.trim().toLowerCase() === d.answer.toLowerCase()) {
+        document.getElementById('snd-ok').play().catch(()=>{});
+        localStorage.setItem(`day_${sId}_${day}`, 'correct');
+        animateCorrectStar(btn);
+        document.getElementById('quiz-container').innerHTML = `<h2>✨ Corretto!</h2><p>${d.spiegazione || ''}</p><button class="btn-ans" onclick="chiudiEProsegui()">PROSEGUI</button>`;
+        if (window.MathJax) MathJax.typeset();
+      } else {
+        document.getElementById('snd-no').play().catch(()=>{});
+        animatePoop(btn);
+        document.getElementById('feedback-msg').innerText = "❌ Errato! Tentativo n. " + att;
+      }
+    }
+
+    function chiudiEProsegui() { document.getElementById('modal-overlay').style.display = 'none'; render(); }
+    
+    function showReport() {
+      document.getElementById('game-screen').style.display = 'none';
+      document.getElementById('report-area').style.display = 'block';
+      document.getElementById('final-stars').innerText = "Stelle Finali: " + stars;
+      const body = document.getElementById('report-body');
+      body.innerHTML = '';
+      adventData.forEach(d => {
+        const theoryPart = d.spiegazione ? `<span class="theory-text">${d.spiegazione}</span>` : '';
+        body.innerHTML += `
+          <tr>
+            <td>${d.day}</td>
+            <td>${d.question}</td>
+            <td>"RispostaOK": "${d.answer}"${theoryPart}</td>
+            <td>${localStorage.getItem(`tent_${currentSfida.id}_${d.day}`) || 1}</td>
+          </tr>`;
+      });
+      if (window.MathJax) MathJax.typeset();
+    }
+
+    function parseCSV(csv) {
+      return csv.split(/\r?\n/).filter(r => r !== "").map(row => {
+        const out = []; let cur = ''; let inQ = false;
+        for (let i = 0; i < row.length; i++) {
+          let char = row[i];
+          if (char === '"') { if (inQ && row[i+1] === '"') { cur += '"'; i++; } else inQ = !inQ; }
+          else if (char === ',' && !inQ) { out.push(cur.trim()); cur = ''; }
+          else cur += char;
+        }
+        out.push(cur.trim()); return out;
+      });
+    }
+
+    function tornaAlMenu() { location.reload(); }
+    function resetGame() { if(confirm("Resettare questa sfida?")) { adventData.forEach(d => { localStorage.removeItem(`day_${currentSfida.id}_${d.day}`); localStorage.removeItem(`tent_${currentSfida.id}_${d.day}`); }); localStorage.removeItem(`stars_${currentSfida.id}`); location.reload(); } }
+    function resetTutto() { if(confirm("Cancellare TUTTO?")) { localStorage.clear(); location.reload(); } }
+
+    window.onload = init;
+  </script>
+</body>
+</html>

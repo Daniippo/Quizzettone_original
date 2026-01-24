@@ -60,18 +60,45 @@
       100% { transform: translateY(20px) scale(1); opacity: 0; }
     }
 
-    /* LAYOUT */
-    #menu-screen { padding: 40px 20px; display: flex; flex-direction: column; align-items: center; text-align: center; }
-    .logo-area h1 { font-family: 'Cinzel', serif; color: var(--c-oro); font-size: 2rem; margin-bottom: 10px; }
-    #sfide-list { width: 100%; max-width: 400px; margin-top: 20px; }
+    /* LAYOUT MENU ADATTIVO */
+    #menu-screen { 
+      padding: 60px 20px; 
+      display: flex; 
+      flex-direction: column; 
+      align-items: center; 
+      text-align: center; 
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+    .logo-area h1 { font-family: 'Cinzel', serif; color: var(--c-oro); font-size: 2.5rem; margin-bottom: 10px; }
+    
+    #sfide-list { 
+      display: grid; 
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); 
+      gap: 20px; 
+      width: 100%; 
+      margin-top: 40px;
+    }
     
     .sfida-card { 
-      background: white; padding: 20px; margin-bottom: 15px; 
-      border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); 
-      cursor: pointer; border: 2px solid transparent; border-left-width: 8px;
-      transition: transform 0.2s; text-align: left;
+      background: white; 
+      padding: 25px; 
+      border-radius: 20px; 
+      box-shadow: 0 8px 20px rgba(0,0,0,0.06); 
+      cursor: pointer; 
+      border: 2px solid transparent; 
+      border-top: 8px solid var(--c-oro);
+      transition: all 0.3s ease; 
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      text-align: left;
     }
+    .sfida-card:hover { transform: translateY(-5px); box-shadow: 0 12px 25px rgba(0,0,0,0.1); }
+    .sfida-card h2 { margin: 0 0 10px 0; font-size: 1.4rem; color: var(--c-testo); }
+    .sfida-card p { margin: 0; font-size: 0.95rem; color: #666; line-height: 1.4; }
 
+    /* LAYOUT GIOCO */
     #game-screen { display: none; flex-grow: 1; }
     .header { padding: 15px; text-align: center; border-bottom: 3px solid var(--c-oro); background: white; position: sticky; top: 0; z-index: 100; display: flex; justify-content: space-between; align-items: center; }
     .back-btn { background: none; border: none; font-size: 1.5rem; color: var(--c-oro); cursor: pointer; }
@@ -111,7 +138,6 @@
     @media print {
       .no-print, #stars-bar, .header, .btn-ans, #menu-screen, #game-screen { display: none !important; }
       #report-area { display: block !important; }
-      th { background-color: #eee !important; color: black !important; }
     }
   </style>
 </head>
@@ -125,10 +151,10 @@
   <div id="menu-screen">
     <div class="logo-area">
       <h1>Didattica Hub</h1>
-      <p>Percorsi didattici Achille e la Tartaruga</p>
+      <p>Seleziona una sfida e inizia il percorso!</p>
     </div>
     <div id="sfide-list">Caricamento sfide...</div>
-    <button class="btn-ans no-print" style="background:#7f8c8d; max-width:200px; margin-top:30px;" onclick="resetTutto()">RESET GLOBALE</button>
+    <button class="btn-ans no-print" style="background:#7f8c8d; max-width:200px; margin-top:40px;" onclick="resetTutto()">RESET GLOBALE</button>
   </div>
 
   <div id="game-screen">
@@ -206,12 +232,19 @@
       document.getElementById('menu-screen').style.display = 'flex';
       const list = document.getElementById('sfide-list');
       list.innerHTML = '';
+      
       SFIDE_CARICATE.forEach(s => {
         const card = document.createElement('div');
         card.className = 'sfida-card';
-        card.style.borderLeftColor = s.colore;
+        card.style.borderTopColor = s.colore;
         card.onclick = () => caricaSfida(s);
-        card.innerHTML = `<h2 style="color:${s.colore}">${s.titolo}</h2><p>${s.desc}</p>`;
+        card.innerHTML = `
+          <div>
+            <h2 style="color:${s.colore}">${s.titolo}</h2>
+            <p>${s.desc}</p>
+          </div>
+          <div style="margin-top:20px; font-weight:bold; color:${s.colore}; font-size:0.8rem;">CLICCA PER INIZIARE ➔</div>
+        `;
         list.appendChild(card);
       });
       document.getElementById('stars-bar').style.display = 'none';
@@ -231,17 +264,14 @@
         const csv = await resp.text();
         const rows = parseCSV(csv);
         TOTAL_LEVELS = parseInt(rows[1][1]) || 0;
-        
-        // --- MODIFICA RICHIESTA: MAPPATURA COLONNE ---
         adventData = rows.slice(4, 4 + TOTAL_LEVELS).map((v, i) => ({
           day: i + 1, 
-          question: v[1],      // Colonna B (Domanda)
-          checkAnswer: v[2],   // Colonna C (Risposta breve per controllo logico)
-          answerOK: v[10],     // Colonna K (Testo formattato report)
+          question: v[1],      
+          checkAnswer: v[2],   
+          answerOK: v[10],     
           options: [v[3], v[4], v[5], v[6], v[7]].filter(o => o && o !== ""),
-          spiegazione: v[12]   // Colonna M (Teoria/Spiegazione)
+          spiegazione: v[12]   
         }));
-        
         render();
       } catch (e) { alert("Errore caricamento sfida."); tornaAlMenu(); }
     }
@@ -338,7 +368,6 @@
       let att = (parseInt(localStorage.getItem(`tent_${sId}_${day}`)) || 0) + 1;
       localStorage.setItem(`tent_${sId}_${day}`, att);
 
-      // --- MODIFICA RICHIESTA: CONTROLLO SU checkAnswer ---
       if (val.trim().toLowerCase() === d.checkAnswer.toLowerCase()) {
         document.getElementById('snd-ok').play().catch(()=>{});
         localStorage.setItem(`day_${sId}_${day}`, 'correct');
@@ -362,7 +391,6 @@
       body.innerHTML = '';
       adventData.forEach(d => {
         const theoryPart = d.spiegazione ? `<span class="theory-text">${d.spiegazione}</span>` : '';
-        // --- MODIFICA RICHIESTA: VISUALIZZAZIONE answerOK ---
         body.innerHTML += `
           <tr>
             <td>${d.day}</td>

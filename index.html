@@ -451,7 +451,7 @@
 
     function aggiornaStelleVisive() {
       document.getElementById('stars-count').innerText = stars;
-      localStorage.setItem(`stars_${currentSfida.id}`, stars);
+     localStorage.setItem('stars_' + currentSfida.id, stars);
     }
 
     function chiudiEProsegui() { document.getElementById('modal-overlay').style.display = 'none'; render(); }
@@ -470,7 +470,8 @@
             <td>${d.day}</td>
             <td>${d.question}</td>
             <td>${d.answerOK}${theoryPart}</td>
-            <td>${localStorage.getItem(\`tent_${currentSfida.id}_${d.day}\`) || 1}</td>
+           <td>${localStorage.getItem('tent_' + currentSfida.id + '_' + d.day) || 1}</td>
+
           </tr>`;
       });
       if (window.MathJax) MathJax.typeset();
@@ -491,7 +492,7 @@
     }
 
     function tornaAlMenu() { location.reload(); }
-    function resetGame() { if(confirm("Resettare questa sfida?")) { adventData.forEach(d => { localStorage.removeItem(\`day_${currentSfida.id}_${d.day}\`); localStorage.removeItem(\`tent_${currentSfida.id}_${d.day}\`); }); localStorage.removeItem(\`stars_${currentSfida.id}\`); location.reload(); } }
+    function resetGame() { if(confirm("Resettare questa sfida?")) { adventData.forEach(d => { localStorage.removeItem('day_' + currentSfida.id + '_' + d.day); localStorage.removeItem('tent_' + currentSfida.id + '_' + d.day); }); localStorage.removeItem('stars_' + currentSfida.id); location.reload(); } }
     function resetTutto() { if(confirm("Cancellare TUTTO?")) { localStorage.clear(); location.reload(); } }
 
     window.onload = init;

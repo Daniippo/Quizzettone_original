@@ -5,6 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Didattica Hub - Sfida Achille e la Tartaruga</title>
 
+  <meta name="author" content="Daniela Ippolito (@matefacile)">
+  <meta name="copyright" content="© Daniela Ippolito (@matefacile)">
+
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#bfa100">
   <link rel="apple-touch-icon" href="icon-512.png">
@@ -134,6 +137,36 @@
       .no-print, #stars-bar, .header, .btn-ans, #menu-screen, #game-screen { display: none !important; }
       #report-area { display: block !important; }
     }
+
+    /* === BRAND / COPYRIGHT (Matefacile) === */
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: #666;
+      font-size: 0.82rem;
+      line-height: 1.2;
+    }
+    .brand img {
+      width: 28px;
+      height: 28px;
+      object-fit: contain;
+      border-radius: 6px;
+    }
+    .brand .brand-text strong { color: var(--c-testo); }
+
+    .brand-home { justify-content: center; margin-top: 10px; }
+    .brand-report { justify-content: center; margin: 8px 0 18px 0; }
+    .brand-header { margin-left: auto; margin-right: 10px; white-space: nowrap; }
+
+    @media (max-width: 420px){
+      .brand-header .brand-text { display: none; } /* in header resta solo il logo */
+    }
+
+    @media print {
+      .brand-header, .brand-home { display: none !important; }
+      .brand-report { display: flex !important; }
+    }
   </style>
 </head>
 <body>
@@ -146,6 +179,7 @@
   <div id="menu-screen">
     <div class="logo-area">
       <h1>Didattica Hub</h1>
+      <div id="brand-home"></div>
     </div>
     <div id="sfide-list">Caricamento sfide...</div>
     <div style="text-align: center;">
@@ -156,12 +190,17 @@
   <div id="game-screen">
     <div class="header no-print">
       <button class="back-btn" onclick="tornaAlMenu()">❮</button>
-      <div>
+
+      <div style="text-align:center; flex:1;">
         <h1 id="topic-title" style="font-family:'Cinzel'; font-size:1rem; margin:0; color:var(--c-oro)">...</h1>
         <small id="progress-text">0/0 completati</small>
       </div>
+
+      <div id="brand-header"></div>
+
       <button class="back-btn" onclick="resetGame()">🔄</button>
     </div>
+
     <div id="main-game-area">
       <div class="vertical-track">
         <div id="achilles" class="avatar">🏃‍♂️</div>
@@ -173,6 +212,7 @@
 
   <div id="report-area">
     <h1 style="font-family:'Cinzel'; color: var(--c-oro);">Report Finale</h1>
+    <div id="brand-report"></div>
     <h2 id="final-stars">Stelle Totali: 0</h2>
     <div class="report-table-container">
       <table>
@@ -212,8 +252,39 @@
     let TOTAL_LEVELS = 0;
     let stars = 0;
 
+    const BRAND = {
+      name: "Daniela Ippolito",
+      handle: "@matefacile",
+      logo: "assets/logo-matefacile.png",
+      year: new Date().getFullYear()
+    };
+
+    function renderBrand(targetId, variant) {
+      const el = document.getElementById(targetId);
+      if (!el) return;
+
+      const cls =
+        variant === "home" ? "brand brand-home" :
+        variant === "header" ? "brand brand-header" :
+        variant === "report" ? "brand brand-report" :
+        "brand";
+
+      el.innerHTML = `
+        <div class="${cls}">
+          <img src="${BRAND.logo}" alt="Matefacile">
+          <div class="brand-text">
+            Creato da <strong>${BRAND.name}</strong> · ${BRAND.handle} · © ${BRAND.year}
+          </div>
+        </div>
+      `;
+    }
+
     /* --- INIZIALIZZAZIONE --- */
     async function init() {
+      renderBrand("brand-home", "home");
+      renderBrand("brand-header", "header");
+      renderBrand("brand-report", "report");
+
       try {
         const resp = await fetch(URL_INDICE_SFIDE);
         const csv = await resp.text();
@@ -399,7 +470,7 @@
             <td>${d.day}</td>
             <td>${d.question}</td>
             <td>${d.answerOK}${theoryPart}</td>
-            <td>${localStorage.getItem(`tent_${currentSfida.id}_${d.day}`) || 1}</td>
+            <td>${localStorage.getItem(\`tent_${currentSfida.id}_${d.day}\`) || 1}</td>
           </tr>`;
       });
       if (window.MathJax) MathJax.typeset();
@@ -420,11 +491,12 @@
     }
 
     function tornaAlMenu() { location.reload(); }
-    function resetGame() { if(confirm("Resettare questa sfida?")) { adventData.forEach(d => { localStorage.removeItem(`day_${currentSfida.id}_${d.day}`); localStorage.removeItem(`tent_${currentSfida.id}_${d.day}`); }); localStorage.removeItem(`stars_${currentSfida.id}`); location.reload(); } }
+    function resetGame() { if(confirm("Resettare questa sfida?")) { adventData.forEach(d => { localStorage.removeItem(\`day_${currentSfida.id}_${d.day}\`); localStorage.removeItem(\`tent_${currentSfida.id}_${d.day}\`); }); localStorage.removeItem(\`stars_${currentSfida.id}\`); location.reload(); } }
     function resetTutto() { if(confirm("Cancellare TUTTO?")) { localStorage.clear(); location.reload(); } }
 
     window.onload = init;
   </script>
 </body>
 </html>
+
 

@@ -289,27 +289,27 @@
 
   <script>
     const URL_INDICE_SFIDE = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRo9ZeS6loicyVFU04pA29n5GxEeg3q7teyh2-Tsd4DUPzwjNyQsPE4OBwG7WF14rSdxbPeTn594i1D/pub?gid=892603852&single=true&output=csv";
- /* === MULTILINGUA === */
-let LANG = localStorage.getItem("lang") || "it";
-function setLang(l){
+/* === MULTILINGUA === */
+let LANG = localStorage.getItem("lang") || "it"; // default: IT
+
+function setLang(l) {
   LANG = l;
   localStorage.setItem("lang", LANG);
   renderMenu();
 }
 
-    let SFIDE_CARICATE = [];
-    let currentSfida = null;
-    let adventData = [];
-    let TOTAL_LEVELS = 0;
-    let stars = 0;
-    let LANG = localStorage.getItem("lang") || "it"; // parte in italiano
+let SFIDE_CARICATE = [];
+let currentSfida = null;
+let adventData = [];
+let TOTAL_LEVELS = 0;
+let stars = 0;
 
-    const BRAND = {
-      name: "Daniela Ippolito",
-      handle: "@matefacile",
-      logo: "assets/logo-matefacile.png",
-      year: new Date().getFullYear()
-    };
+const BRAND = {
+  name: "Daniela Ippolito",
+  handle: "@matefacile",
+  logo: "assets/logo-matefacile.png",
+  year: new Date().getFullYear()
+};
 
     function renderBrand(targetId, variant) {
       const el = document.getElementById(targetId);

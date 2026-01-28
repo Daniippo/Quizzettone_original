@@ -493,7 +493,7 @@ const resp = await fetch(urlSfida);
 
         render();
       } catch (e) {
-        alert("Errore caricamento sfida.");
+        alert(t("loadingChallengeError"));
         console.error(e);
         tornaAlMenu();
       }
@@ -596,14 +596,19 @@ const resp = await fetch(urlSfida);
         document.getElementById('snd-ok').play().catch(() => {});
         localStorage.setItem('day_' + sId + '_' + day, 'correct');
         animateCorrectStar(btn);
-        document.getElementById('quiz-container').innerHTML =
-        '<h2>'✨ + t("correct") + '</h2><p>' + (d.spiegazione || '') + '</p><button class="btn-ans" onclick="chiudiEProsegui()">' + t("continue") + '</button>';
+      document.getElementById('quiz-container').innerHTML =
+  '<h2>' + t("correct") + '</h2>' +
+  '<p>' + (d.spiegazione || '') + '</p>' +
+  '<button class="btn-ans" onclick="chiudiEProsegui()">' + t("continue") + '</button>';
+
 
         if (window.MathJax) MathJax.typeset();
       } else {
         document.getElementById('snd-no').play().catch(() => {});
         animatePoop(btn);
-        document.getElementById('feedback-msg').innerText = "❌ Errato! Tentativo n. " + att;
+        document.getElementById('feedback-msg').innerText =
+  t("wrong") + " " + t("attempt") + " n. " + att;
+
       }
     }
 

@@ -590,7 +590,8 @@ const resp = await fetch(urlSfida);
         container.appendChild(wrapper);
       });
 
-      document.getElementById('progress-text').innerText = solved + '/' + TOTAL_LEVELS;
+      document.getElementById('progress-text').innerText =
+  solved + '/' + TOTAL_LEVELS + ' ' + t("progressDone");
 
       muoviPersonaggi(solved);
 

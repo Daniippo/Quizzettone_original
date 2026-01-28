@@ -620,9 +620,12 @@ console.log("SFIDE_CARICATE:", SFIDE_CARICATE);
           else if (char === ',' && !inQ) { out.push(cur.trim()); cur = ''; }
           else cur += char;
         }
-
+       out.push(cur.trim()); return out;
+      });
+    }
+// Converte le righe del CSV in oggetti usando la prima riga come header
 function rowsToObjects(rows) {
-  const headers = rows[0].map(h => (h || "").trim());
+  const headers = rows[0].map(h => (h || "").replace(/^\uFEFF/, "").trim());
   return rows
     .slice(1)
     .filter(r => r.some(cell => (cell || "").trim() !== ""))
@@ -633,10 +636,9 @@ function rowsToObjects(rows) {
     });
 }
 
+
         
-        out.push(cur.trim()); return out;
-      });
-    }
+     
 
     function tornaAlMenu() { location.reload(); }
 

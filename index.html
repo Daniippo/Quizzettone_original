@@ -379,26 +379,39 @@ console.log("SFIDE_CARICATE:", SFIDE_CARICATE);
 
     /* --- MENU --- */
     function renderMenu() {
-      document.getElementById('report-area').style.display = 'none';
-      document.getElementById('game-screen').style.display = 'none';
-      document.getElementById('menu-screen').style.display = 'block';
-      const list = document.getElementById('sfide-list');
-      list.innerHTML = '';
+  document.getElementById('report-area').style.display = 'none';
+  document.getElementById('game-screen').style.display = 'none';
+  document.getElementById('menu-screen').style.display = 'block';
 
-      SFIDE_CARICATE.forEach(s => {
-        const card = document.createElement('div');
-        card.className = 'sfida-card';
-        card.style.borderTopColor = s.colore;
-        card.onclick = () => caricaSfida(s);
-        card.innerHTML = `
-          <h2 style="color:${s.colore}">${s.titolo}</h2>
-          <p>${s.desc}</p>
-        `;
-        list.appendChild(card);
-      });
+  const list = document.getElementById('sfide-list');
+  list.innerHTML = '';
 
-      document.getElementById('stars-bar').style.display = 'none';
-    }
+  SFIDE_CARICATE.forEach(s => {
+    // nascondi sfide disabilitate (colonna enabled)
+    if (!s.enabled) return;
+
+    const hasEN = s.url_en && s.url_en.trim() !== "";
+    // in EN mostra solo quelle tradotte
+    if (LANG === "en" && !hasEN) return;
+
+    const titolo = (LANG === "en") ? (s.titolo_en || s.titolo_it) : s.titolo_it;
+    const desc   = (LANG === "en") ? (s.desc_en   || s.desc_it)   : s.desc_it;
+
+    const card = document.createElement('div');
+    card.className = 'sfida-card';
+    card.style.borderTopColor = s.colore;
+    card.onclick = () => caricaSfida(s);
+
+    card.innerHTML = `
+      <h2 style="color:${s.colore}">${titolo}</h2>
+      <p>${desc}</p>
+    `;
+
+    list.appendChild(card);
+  });
+
+  document.getElementById('stars-bar').style.display = 'none';
+}
 
     /* --- CARICAMENTO SFIDA --- */
     async function caricaSfida(sfida) {
@@ -411,10 +424,18 @@ console.log("SFIDE_CARICATE:", SFIDE_CARICATE);
       document.getElementById('stars-bar').style.display = 'flex';
       document.getElementById('menu-screen').style.display = 'none';
       document.getElementById('game-screen').style.display = 'block';
-      document.getElementById('topic-title').innerText = sfida.titolo;
+     document.getElementById('topic-title').innerText =
+  (LANG === "en") ? (sfida.titolo_en || sfida.titolo_it) : sfida.titolo_it;
+
+
 
       try {
-        const resp = await fetch(sfida.url);
+        const urlSfida = (LANG === "en" && sfida.url_en && sfida.url_en.trim() !== "")
+  ? sfida.url_en
+  : sfida.url_it;
+
+const resp = await fetch(urlSfida);
+
         const csv = await resp.text();
         const rows = parseCSV(csv);
         TOTAL_LEVELS = parseInt(rows[1][1]) || 0;
@@ -636,10 +657,6 @@ function rowsToObjects(rows) {
       return obj;
     });
 }
-
-
-        
-     
 
     function tornaAlMenu() { location.reload(); }
 

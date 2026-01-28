@@ -597,7 +597,8 @@ const resp = await fetch(urlSfida);
         localStorage.setItem('day_' + sId + '_' + day, 'correct');
         animateCorrectStar(btn);
         document.getElementById('quiz-container').innerHTML =
-          '<h2>✨ Corretto!</h2><p>' + (d.spiegazione || '') + '</p><button class="btn-ans" onclick="chiudiEProsegui()">PROSEGUI</button>';
+        '<h2>'✨ + t("correct") + '</h2><p>' + (d.spiegazione || '') + '</p><button class="btn-ans" onclick="chiudiEProsegui()">' + t("continue") + '</button>';
+
         if (window.MathJax) MathJax.typeset();
       } else {
         document.getElementById('snd-no').play().catch(() => {});

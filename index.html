@@ -294,18 +294,18 @@
   </div>
 
   <div id="report-area">
-    <h1 style="font-family:'Cinzel'; color: var(--c-oro);">Report Finale</h1>
+    <h1 id="report-title" style="font-family:'Cinzel'; color: var(--c-oro);"></h1>
     <div id="brand-report"></div>
-    <h2 id="final-stars">Stelle Totali: 0</h2>
+   <h2 id="final-stars"></h2>
 
     <div class="report-table-container">
       <table>
         <thead>
           <tr>
             <th>#</th>
-            <th>Domanda</th>
-            <th>Risposta Corretta</th>
-            <th>Tentativi</th>
+            <th id="th-question"></th>
+            <th id="th-correct"></th>
+            <th id="th-attempts"></th>
           </tr>
         </thead>
         <tbody id="report-body"></tbody>
@@ -366,6 +366,9 @@ const I18N = {
     print: "STAMPA REPORT",
     home: "HOME",
     resetAll: "RESET TOTALE"
+    reportQuestion: "Domanda",
+    reportCorrect: "Risposta corretta",
+    reportAttempts: "Tentativi",
   },
 
   en: {
@@ -382,16 +385,15 @@ const I18N = {
     print: "PRINT REPORT",
     home: "HOME",
     resetAll: "RESET ALL"
+    reportQuestion: "Question",
+    reportCorrect: "Correct Answer",
+    reportAttempts: "Attempts",
   }
 };
 function t(key) {
   return I18N[LANG]?.[key] || I18N.it[key] || key;
 }
 
-    
-
-
-    
 let SFIDE_CARICATE = [];
 let currentSfida = null;
 let adventData = [];
@@ -713,8 +715,14 @@ const resp = await fetch(urlSfida);
     function showReport() {
       document.getElementById('game-screen').style.display = 'none';
       document.getElementById('report-area').style.display = 'block';
-      document.getElementById('final-stars').innerText = "Stelle Finali: " + stars;
-
+     // Titoli report
+      document.getElementById("report-title").innerText = t("finalReport");
+      document.getElementById("final-stars").innerText = t("totalStars") + ": " + stars;
+      
+      // Header tabella
+      document.getElementById("th-question").innerText = t("reportQuestion");
+      document.getElementById("th-correct").innerText = t("reportCorrect");
+      document.getElementById("th-attempts").innerText = t("reportAttempts");
       const body = document.getElementById('report-body');
       body.innerHTML = '';
 

@@ -369,7 +369,12 @@ const I18N = {
     loadingChallengeError: "Errore caricamento sfida.",
     reportQuestion: "Domanda",
     reportCorrect: "Risposta corretta",
-    reportAttempts: "Tentativi"
+    reportAttempts: "Tentativi",
+    progressDone: "completati",
+    resetChallengeQ: "Resettare questa sfida?",
+    deleteAllQ: "Cancellare TUTTO?",
+    loadingChallenges: "Caricamento sfide..."
+
   },
 
   en: {
@@ -389,7 +394,11 @@ const I18N = {
     loadingChallengeError: "Error loading challenge.",
     reportQuestion: "Question",
     reportCorrect: "Correct Answer",
-    reportAttempts: "Attempts"
+    reportAttempts: "Attempts",
+    progressDone: "completed",
+    resetChallengeQ: "Reset this challenge?",
+    deleteAllQ: "Delete EVERYTHING?",
+    loadingChallenges: "Loading challenges..."
   }
 };
 
@@ -467,8 +476,8 @@ SFIDE_CARICATE = objs.map(o => ({
 }));
 
 console.log("SFIDE_CARICATE:", SFIDE_CARICATE);
-
-        renderMenu();
+updateLangUI();
+    renderMenu();
      } catch (e) {
   document.getElementById('sfide-list').innerText = "Errore indice: " + (e?.message || e);
   console.error("Errore indice:", e);

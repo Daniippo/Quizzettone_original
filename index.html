@@ -342,29 +342,32 @@ function setLang(l){
         const resp = await fetch(URL_INDICE_SFIDE);
         const csv = await resp.text();
         const rows = parseCSV(csv);
+         const objs = rowsToObjects(rows);
         
-       /* --- per leggere correttamente il mio CSV --- */
-function rowsToObjects(rows) {
-  const headers = rows[0].map(h => (h || "").trim());
-  return rows
-    .slice(1)
-    .filter(r => r.some(cell => (cell || "").trim() !== ""))
-    .map(r => {
-      const obj = {};
-      headers.forEach((h, i) => obj[h] = (r[i] ?? "").trim());
-      return obj;
-    });
-}
 
 
+SFIDE_CARICATE = objs.map(o => ({
+  id: o.ID,
 
+  titolo_it: o.titolo_it,
+  desc_it: o.desc_it,
+  url_it: o.url_it,
+  colore: o.colore || "#bfa100",
 
+  titolo_en: o.titolo_en,
+  desc_en: o.desc_en,
+  url_en: o.url_en,
 
+  image_url: o.image_url,
+  enabled: (o.enabled || "").toLowerCase() === "true"
+        || (o.enabled || "").toLowerCase() === "yes"
+        || (o.enabled || "").toLowerCase() === "si"
+        || o.enabled === "1",
+  materia: o.Materia
+}));
 
+console.log("SFIDE_CARICATE:", SFIDE_CARICATE);
 
-
-        
-        SFIDE_CARICATE = rows.slice(1).map(r => ({ id: r[0], titolo: r[1], desc: r[2], url: r[3], colore: r[4] || "#bfa100" }));
         renderMenu();
       } catch (e) {
         document.getElementById('sfide-list').innerText = "Errore indice.";
@@ -616,6 +619,20 @@ function rowsToObjects(rows) {
           else if (char === ',' && !inQ) { out.push(cur.trim()); cur = ''; }
           else cur += char;
         }
+
+function rowsToObjects(rows) {
+  const headers = rows[0].map(h => (h || "").trim());
+  return rows
+    .slice(1)
+    .filter(r => r.some(cell => (cell || "").trim() !== ""))
+    .map(r => {
+      const obj = {};
+      headers.forEach((h, i) => obj[h] = (r[i] ?? "").trim());
+      return obj;
+    });
+}
+
+        
         out.push(cur.trim()); return out;
       });
     }

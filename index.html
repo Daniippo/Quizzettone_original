@@ -298,6 +298,48 @@ function setLang(l) {
   renderMenu();
 }
 
+/* === TRADUZIONI UI === */
+const I18N = {
+  it: {
+    loading: "Caricamento sfide...",
+    indexError: "Errore indice",
+    question: "Domanda",
+    correct: "✨ Corretto!",
+    wrong: "❌ Errato!",
+    attempt: "Tentativo",
+    attempts: "Tentativi",
+    continue: "PROSEGUI",
+    finalReport: "Report Finale",
+    totalStars: "Stelle Finali",
+    print: "STAMPA REPORT",
+    home: "HOME",
+    resetAll: "RESET TOTALE"
+  },
+
+  en: {
+    loading: "Loading challenges...",
+    indexError: "Index error",
+    question: "Question",
+    correct: "✨ Correct!",
+    wrong: "❌ Wrong!",
+    attempt: "Attempt",
+    attempts: "Attempts",
+    continue: "CONTINUE",
+    finalReport: "Final Report",
+    totalStars: "Final Stars",
+    print: "PRINT REPORT",
+    home: "HOME",
+    resetAll: "RESET ALL"
+  }
+};
+function t(key) {
+  return I18N[LANG]?.[key] || I18N.it[key] || key;
+}
+
+    
+
+
+    
 let SFIDE_CARICATE = [];
 let currentSfida = null;
 let adventData = [];
@@ -526,7 +568,7 @@ const resp = await fetch(urlSfida);
       const cont = document.getElementById('quiz-container');
       document.getElementById('feedback-msg').innerText = "";
 
-      let h = '<h3>Domanda ' + day + '</h3><p style="font-weight:700;">' + d.question + '</p>';
+      let h = '<h3>' + t("question") + ' ' + day + '</h3><p style="font-weight:700;">' + d.question + '</p>';
 
       if (d.options.length > 0) {
         d.options.forEach((o, i) => {

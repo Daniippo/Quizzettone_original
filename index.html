@@ -330,6 +330,8 @@ function setLang(l){
       `;
     }
 
+
+
     /* --- INIZIALIZZAZIONE --- */
     async function init() {
       renderBrand("brand-home", "home");
@@ -340,6 +342,28 @@ function setLang(l){
         const resp = await fetch(URL_INDICE_SFIDE);
         const csv = await resp.text();
         const rows = parseCSV(csv);
+        
+       /* --- per leggere correttamente il mio CSV --- */
+function rowsToObjects(rows) {
+  const headers = rows[0].map(h => (h || "").trim());
+  return rows
+    .slice(1)
+    .filter(r => r.some(cell => (cell || "").trim() !== ""))
+    .map(r => {
+      const obj = {};
+      headers.forEach((h, i) => obj[h] = (r[i] ?? "").trim());
+      return obj;
+    });
+}
+
+
+
+
+
+
+
+
+        
         SFIDE_CARICATE = rows.slice(1).map(r => ({ id: r[0], titolo: r[1], desc: r[2], url: r[3], colore: r[4] || "#bfa100" }));
         renderMenu();
       } catch (e) {

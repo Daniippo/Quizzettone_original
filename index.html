@@ -709,15 +709,24 @@ const resp = await fetch(urlSfida);
       poop.style.top = (rect.top - 20) + 'px';
       document.body.appendChild(poop);
 
-      stars = Math.max(0, stars - 1);
+      stars = stars - 1;
       aggiornaStelleVisive();
       setTimeout(() => poop.remove(), 650);
     }
 
-    function aggiornaStelleVisive() {
-      document.getElementById('stars-count').innerText = stars;
-      localStorage.setItem('stars_' + currentSfida.id, stars);
-    }
+   function aggiornaStelleVisive() {
+  const el = document.getElementById('stars-count');
+  el.innerText = stars;
+
+  if (stars < 0) {
+    el.style.color = "#e74c3c"; // rosso
+  } else {
+    el.style.color = "var(--c-oro)";
+  }
+
+  localStorage.setItem('stars_' + currentSfida.id, stars);
+}
+
 
     function chiudiEProsegui() {
       document.getElementById('modal-overlay').style.display = 'none';

@@ -369,10 +369,11 @@ SFIDE_CARICATE = objs.map(o => ({
 console.log("SFIDE_CARICATE:", SFIDE_CARICATE);
 
         renderMenu();
-      } catch (e) {
-        document.getElementById('sfide-list').innerText = "Errore indice.";
-        console.error(e);
-      }
+     } catch (e) {
+  document.getElementById('sfide-list').innerText = "Errore indice: " + (e?.message || e);
+  console.error("Errore indice:", e);
+}
+
     }
 
     /* --- MENU --- */

@@ -365,10 +365,11 @@ const I18N = {
     totalStars: "Stelle Finali",
     print: "STAMPA REPORT",
     home: "HOME",
-    resetAll: "RESET TOTALE"
+    resetAll: "RESET TOTALE",
+    loadingChallengeError: "Errore caricamento sfida.",
     reportQuestion: "Domanda",
     reportCorrect: "Risposta corretta",
-    reportAttempts: "Tentativi",
+    reportAttempts: "Tentativi"
   },
 
   en: {
@@ -384,12 +385,14 @@ const I18N = {
     totalStars: "Final Stars",
     print: "PRINT REPORT",
     home: "HOME",
-    resetAll: "RESET ALL"
+    resetAll: "RESET ALL",
+    loadingChallengeError: "Error loading challenge.",
     reportQuestion: "Question",
     reportCorrect: "Correct Answer",
-    reportAttempts: "Attempts",
+    reportAttempts: "Attempts"
   }
 };
+
 function t(key) {
   return I18N[LANG]?.[key] || I18N.it[key] || key;
 }

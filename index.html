@@ -202,6 +202,46 @@
       .brand-header, .brand-home { display: none !important; }
       .brand-report { display: flex !important; }
     }
+/* === LANGUAGE TOGGLE === */
+.lang-toggle{
+  display:flex;
+  justify-content:center;
+  gap:10px;
+  margin-top:12px;
+  position: sticky;
+  top: 10px;
+  z-index: 1500;
+}
+
+.lang-btn{
+  border: 2px solid var(--c-oro);
+  background: #fff;
+  color: var(--c-testo);
+  padding: 10px 14px;
+  border-radius: 999px;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+  min-width: 160px;
+}
+
+.lang-btn.active{
+  background: var(--c-oro);
+  color: #fff;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(0,0,0,0.14);
+}
+
+.lang-btn:active{
+  transform: translateY(0);
+}
+
+
+
+
+
+
+    
   </style>
 </head>
 
@@ -218,10 +258,11 @@
       <div id="brand-home"></div>
     </div>
 <!-- SWITCH LINGUA -->
-<div class="no-print" style="display:flex; justify-content:center; gap:10px; margin-top:12px;">
-  <button class="btn-ans" style="max-width:140px;" onclick="setLang('it')">🇮🇹 IT</button>
-  <button class="btn-ans" style="max-width:140px;" onclick="setLang('en')">🇬🇧 EN</button>
+<div class="no-print lang-toggle">
+  <button id="btn-lang-it" class="lang-btn" onclick="setLang('it')">🇮🇹 Italiano</button>
+  <button id="btn-lang-en" class="lang-btn" onclick="setLang('en')">🇬🇧 English</button>
 </div>
+
 
     <div id="sfide-list">Caricamento sfide...</div>
     <div style="text-align: center;">
@@ -292,11 +333,22 @@
 /* === MULTILINGUA === */
 let LANG = localStorage.getItem("lang") || "it"; // default: IT
 
+function updateLangUI() {
+  const bIt = document.getElementById("btn-lang-it");
+  const bEn = document.getElementById("btn-lang-en");
+  if (!bIt || !bEn) return;
+
+  bIt.classList.toggle("active", LANG === "it");
+  bEn.classList.toggle("active", LANG === "en");
+}
+
 function setLang(l) {
   LANG = l;
   localStorage.setItem("lang", LANG);
+  updateLangUI();
   renderMenu();
 }
+
 
 /* === TRADUZIONI UI === */
 const I18N = {

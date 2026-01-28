@@ -3,7 +3,7 @@
   "name": "Sfida Finale: Achille e la Tartaruga",
   "icons": [
     {
-      "src": "LogoAppEN.png",
+      "src": "LogoApp.png",
       "type": "image/png",
       "sizes": "512x512",
       "purpose": "any maskable"

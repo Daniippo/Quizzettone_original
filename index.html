@@ -295,6 +295,7 @@
 
   <div id="report-area">
     <h1 id="report-title" style="font-family:'Cinzel'; color: var(--c-oro);"></h1>
+    <p id="report-meta" style="margin:6px 0 14px 0; color:#555;"></p>
     <div id="brand-report"></div>
    <h2 id="final-stars"></h2>
 
@@ -373,7 +374,11 @@ const I18N = {
     progressDone: "completati",
     resetChallengeQ: "Resettare questa sfida?",
     deleteAllQ: "Cancellare TUTTO?",
-    loadingChallenges: "Caricamento sfide..."
+    loadingChallenges: "Caricamento sfide...",
+    reportUserLabel: "Studente",
+    reportDateLabel: "Data e ora",
+    askName: "Inserisci il tuo nome e cognome",
+
 
   },
 
@@ -398,12 +403,27 @@ const I18N = {
     progressDone: "completed",
     resetChallengeQ: "Reset this challenge?",
     deleteAllQ: "Delete EVERYTHING?",
-    loadingChallenges: "Loading challenges..."
+    loadingChallenges: "Loading challenges...",
+    reportUserLabel: "Student",
+    reportDateLabel: "Date & time",
+    askName: "Enter your name",
+
   }
 };
 
 function t(key) {
   return I18N[LANG]?.[key] || I18N.it[key] || key;
+}
+function getStudentName() {
+  const key = "student_name";
+  let name = localStorage.getItem(key);
+
+  if (!name) {
+    name = prompt(t("askName")) || "";
+    name = name.trim();
+    if (name) localStorage.setItem(key, name);
+  }
+  return name || "-";
 }
 
 let SFIDE_CARICATE = [];
@@ -740,7 +760,17 @@ const resp = await fetch(urlSfida);
      // Titoli report
       document.getElementById("report-title").innerText = t("finalReport");
       document.getElementById("final-stars").innerText = t("totalStars") + ": " + stars;
-      
+
+    const student = getStudentName();
+    const now = new Date();
+    const dt = new Intl.DateTimeFormat(LANG === "it" ? "it-IT" : "en-GB", {
+      dateStyle: "full",
+      timeStyle: "short"
+    }).format(now);
+    document.getElementById("report-meta").innerText =
+      t("reportUserLabel") + ": " + student + " · " +
+      t("reportDateLabel") + ": " + dt;
+
       // Header tabella
       document.getElementById("th-question").innerText = t("reportQuestion");
       document.getElementById("th-correct").innerText = t("reportCorrect");

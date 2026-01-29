@@ -572,6 +572,7 @@ const resp = await fetch(urlSfida);
           day: i + 1,
           question: v[1],
           checkAnswer: v[2],
+          answerShort: v[11],
           answerOK: v[10],
           options: [v[3], v[4], v[5], v[6], v[7]].filter(o => o && o !== ""),
           spiegazione: v[12]
@@ -779,12 +780,20 @@ const resp = await fetch(urlSfida);
       body.innerHTML = '';
 
       adventData.forEach(d => {
-        const theoryPart = d.spiegazione ? '<span class="theory-text">' + d.spiegazione + '</span>' : '';
-        body.innerHTML +=
-          '<tr>' +
-            '<td>' + d.day + '</td>' +
-            '<td>' + d.question + '</td>' +
-            '<td>' + d.answerOK + theoryPart + '</td>' +
+const theoryPart = d.spiegazione
+  ? '<span class="theory-text">' + d.spiegazione + '</span>'
+  : '';
+
+const answerBlock =
+  (d.answerShort ? ('<strong>' + d.answerShort + '</strong><br>') : '') +
+  (d.answerOK || '') +
+  theoryPart;
+
+body.innerHTML +=
+  '<tr>' +
+    '<td>' + d.day + '</td>' +
+    '<td>' + d.question + '</td>' +
+    '<td>' + answerBlock + '</td>' +
             '<td>' + (localStorage.getItem('tent_' + currentSfida.id + '_' + d.day) || 1) + '</td>' +
           '</tr>';
       });

@@ -637,18 +637,47 @@ const resp = await fetch(urlSfida);
         if (tortNode) moveAvatar('tortoise', tortNode, trackRect);
       }, 150);
     }
+/*  memorizzo posizione */
+let lastAvatarX = {
+  achilles: null,
+  tortoise: null
+};
 
-    function moveAvatar(id, node, trackRect) {
-      const avatar = document.getElementById(id);
-      if (!avatar) return;
 
-      const nodeRect = node.getBoundingClientRect();
+function moveAvatar(id, node, trackRect) {
+  const avatar = document.getElementById(id);
+  if (!avatar) return;
 
-      const x = (nodeRect.left - trackRect.left) + (nodeRect.width / 2) - (avatar.offsetWidth / 2);
-      const y = (nodeRect.top - trackRect.top) - avatar.offsetHeight + 10;
+  const nodeRect = node.getBoundingClientRect();
 
-      avatar.style.transform = 'translate(' + x + 'px, ' + y + 'px)';
+  const x =
+    (nodeRect.left - trackRect.left) +
+    (nodeRect.width / 2) -
+    (avatar.offsetWidth / 2);
+
+  const y =
+    (nodeRect.top - trackRect.top) -
+    avatar.offsetHeight +
+    10;
+
+  /* === DIREZIONE === */
+  let scale = 1; // normale = guarda a sinistra
+
+  if (lastAvatarX[id] !== null) {
+    if (x > lastAvatarX[id]) {
+      scale = -1; // va a destra → gira
+    } else {
+      scale = 1; // va a sinistra → normale
     }
+  }
+
+  lastAvatarX[id] = x;
+
+  /* === TRASFORMAZIONE === */
+  avatar.style.transform =
+    'translate(' + x + 'px, ' + y + 'px) scaleX(' + scale + ')';
+}
+
 
     /* --- GESTIONE QUIZ --- */
     function openQuiz(day) {

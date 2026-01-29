@@ -314,7 +314,7 @@
     </div>
 
     <div class="no-print">
-      <button class="btn-ans" style="display:inline-block; width:auto; padding: 10px 30px; margin-top: 20px;" onclick="window.print()">🖨️ STAMPA REPORT</button>
+      <button class="btn-ans" style="display:inline-block; width:auto; padding: 10px 30px; margin-top: 20px;" onclick="printReport()">🖨️ STAMPA REPORT</button>
       <button class="btn-ans" style="display:inline-block; width:auto; background:#7f8c8d; padding: 10px 30px;" onclick="tornaAlMenu()">🏠 HOME</button>
     </div>
   </div>
@@ -837,7 +837,34 @@ function rowsToObjects(rows) {
         location.reload();
       }
     }
+function printReport() {
+  const oldTitle = document.title;
 
+  const student = getStudentName();
+  const now = new Date();
+
+  const dateStr = now.toISOString().slice(0,10); // YYYY-MM-DD
+
+  document.title =
+    "Report_" +
+    currentSfida.id + "_" +
+    student.replace(/\s+/g, "_") + "_" +
+    dateStr;
+
+  window.print();
+
+  // Ripristina titolo dopo stampa
+  setTimeout(() => {
+    document.title = oldTitle;
+  }, 1000);
+}
+
+
+
+
+
+
+    
     window.onload = init;
   </script>
 </body>
